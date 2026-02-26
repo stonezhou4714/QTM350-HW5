@@ -1,0 +1,96 @@
+---
+title: "QTM350 Homework 5 - WDI Analysis"
+author: "Yunshi Zhou"
+date: 2026-02-24
+format:
+  html: default
+  pdf: default
+bibliography: references.bib
+---
+
+## Loading the Data
+
+```{r}
+library(tidyverse)
+wdi <- read_csv("wdi.csv")
+glimpse(wdi)
+```
+
+## GDP Per Capita, Life Expectancy, and CO2 Emissions
+
+```{r}
+summary(wdi$gdp_per_capita)
+ggplot(wdi, aes(x = gdp_per_capita)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Distribution of GDP per Capita")
+```
+
+GDP per capita shows a highly right-skewed distribution. Most countries have relatively low income levels, while a small number of countries have extremely high values.
+
+```{r}
+summary(wdi$life_expectancy)
+ggplot(wdi, aes(x = life_expectancy)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Distribution of Life Expectancy")
+```
+
+Life expectancy is more normally distributed. Most countries fall between 65 and 80 years, with the highest count as \~75 years old.
+
+```{r}
+summary(wdi$primary_school_enrolment_rate)
+ggplot(wdi, aes(x = primary_school_enrolment_rate)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Distribution of Primary School Enrollment")
+```
+
+Primary school enrollment rates are generally high across countries. Most countries show enrollment rates around 80-110%. (I don't know why the enrollment rate can be higher than 100%)
+
+## Relationship between Income and Health, Top Countries by Primary School Enrollment
+
+```{r}
+#| label: fig-gdp-health
+#| echo: false
+#| fig-cap: "Figure 1: Relationship between GDP per capita and Life Expectancy (Source: World Development Indicators)."
+ggplot(wdi, aes(x = gdp_per_capita, y = life_expectancy)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "GDP per Capita vs Life Expectancy",
+    x = "GDP per Capita (USD)",
+    y = "Life Expectancy (Years)"
+  )
+```
+
+```{r}
+#| label: fig-primary-school
+#| echo: false
+#| fig-cap: "Figure 2: Top 10 Countries by Primary School Enrollment Rate (Source: World Development Indicators)."
+top10 <- wdi %>%
+  arrange(desc(primary_school_enrolment_rate)) %>%
+  slice(1:10)
+ggplot(top10, aes(x = reorder(country, primary_school_enrolment_rate), y = primary_school_enrolment_rate)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 10 Countries by Primary School Enrollment",
+    x = "Country",
+    y = "Enrollment Rate (%)"
+  )
+```
+
+## Summary: Statistics Table
+
+```{r}
+#| echo: false
+library(dplyr)
+library(knitr)
+summary_table <- wdi %>%
+  summarise(
+    `GDP per Capita Mean` = mean(gdp_per_capita, na.rm = TRUE),
+    `GDP per Capita Median` = median(gdp_per_capita, na.rm = TRUE),
+    `Life Expectancy Mean` = mean(life_expectancy, na.rm = TRUE),
+    `Life Expectancy Median` = median(life_expectancy, na.rm = TRUE),
+    `Enrollment Rate Mean` = mean(primary_school_enrolment_rate, na.rm = TRUE),
+    `Enrollment Rate Median` = median(primary_school_enrolment_rate, na.rm = TRUE)
+  )
+kable(summary_table, digits = 2, caption = "Table 1: Key Summary Statistics of Selected Indicators (Source: World Development Indicators)")
+```

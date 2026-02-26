@@ -1,0 +1,61 @@
+---
+title: "QTM350 - Homework 5: World Development Indicators Analysis"
+author: "Yunshi Zhou"
+format:
+  revealjs:
+    theme: moon
+    transition: slide
+    slide-number: true
+---
+
+## Introduction
+
+This presentation explores selected indicators from the World Development Indicators dataset.
+
+Key indicators analysed:
+
+-   GDP per capita
+-   Life expectancy
+-   Primary school enrollment rate
+
+## Income and Health Relationship
+
+```{r}
+#| echo: false
+library(tidyverse)
+wdi <- read_csv("wdi.csv")
+library(ggplot2)
+ggplot(wdi, aes(x = gdp_per_capita, y = life_expectancy)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "GDP per Capita vs Life Expectancy",
+    x = "GDP per Capita",
+    y = "Life Expectancy"
+  )
+```
+
+## Primary School Enrollment
+
+```{r}
+#| echo: false
+top10 <- wdi %>%
+  arrange(desc(primary_school_enrolment_rate)) %>%
+  slice(1:10)
+ggplot(top10, aes(x = reorder(country, primary_school_enrolment_rate), y = primary_school_enrolment_rate)) +
+  geom_col() +
+  coord_flip()
+```
+
+## Key Findings
+
+-   Higher GDP is associated with longer life expectancy.
+-   Enrollment rates are generally high worldwide.
+-   Economic inequality remains significant.
+
+## Conclusion
+
+This analysis highlights global disparities in income, health, and education.
+
+Future work could explore trends over time and regional patterns.
+
+Thank you!
